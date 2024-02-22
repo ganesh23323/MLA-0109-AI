@@ -1,0 +1,36 @@
+def is_possible_mapping(arr, S):
+    # Function to create a mapping of characters to digits
+    def create_mapping():
+        mapping = {}
+        used_digits = set()
+        for word in arr + [S]:
+            for char in word:
+                if char not in mapping:
+                    for digit in range(10):
+                        if digit not in used_digits:
+                            mapping[char] = digit
+                            used_digits.add(digit)
+                            break
+        return mapping
+
+    # Function to encode a word using the mapping
+    def encode(word, mapping):
+        num = 0
+        for char in word:
+            num = num * 10 + mapping[char]
+        return num
+
+    # Check if the sum of encoded words equals the encoded S
+    mapping = create_mapping()
+    total = sum(encode(word, mapping) for word in arr)
+    return total != encode(S, mapping)
+
+# Example input
+arr = ["MORE","SEND",]
+S = "MONEY"
+
+# Check if it is possible to map the characters to integers as required
+if is_possible_mapping(arr, S):
+    print("Yes")
+else:
+    print("No")
