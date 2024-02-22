@@ -1,0 +1,40 @@
+class VacuumCleaner:
+    def __init__(self, grid):
+        self.grid = grid
+        self.visited = set()
+
+    def dfs(self, i, j):
+        if (i, j) in self.visited or not self.is_valid(i, j):
+            return
+
+        self.visited.add((i, j))
+        self.clean(i, j)
+
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        for dx, dy in directions:
+            self.dfs(i + dx, j + dy)
+
+    def is_valid(self, i, j):
+        return 0 <= i < len(self.grid) and 0 <= j < len(self.grid[0]) and self.grid[i][j] == 'dirty'
+
+    def clean(self, i, j):
+        self.grid[i][j] = 'clean'
+        print(f"Cleaned cell at ({i}, {j})")
+
+def main():
+    grid = [
+        ['clean', 'dirty', 'clean', 'clean'],
+        ['clean', 'dirty', 'clean', 'dirty'],
+        ['clean', 'clean', 'dirty', 'clean'],
+        ['dirty', 'clean', 'dirty', 'clean']
+    ]
+
+    cleaner = VacuumCleaner(grid)
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if grid[i][j] == 'dirty':
+                print("Starting cleaning process from cell:", (i, j))
+                cleaner.dfs(i, j)
+
+if __name__ == "__main__":
+    main()
