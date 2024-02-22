@@ -1,0 +1,70 @@
+def water_jug_problem():
+    # Initial states of the jugs
+    jug_4 = 0  # 4-gallon jug
+    jug_3 = 0  # 3-gallon jug
+
+    # Function to fill the 4-gallon jug
+    def fill_jug_4():
+        nonlocal jug_4
+        jug_4 = 4
+
+    # Function to fill the 3-gallon jug
+    def fill_jug_3():
+        nonlocal jug_3
+        jug_3 = 3
+
+    # Function to empty the 4-gallon jug
+    def empty_jug_4():
+        nonlocal jug_4
+        jug_4 = 0
+
+    # Function to empty the 3-gallon jug
+    def empty_jug_3():
+        nonlocal jug_3
+        jug_3 = 0
+
+    # Function to pour water from jug_3 to jug_4
+    def pour_jug_3_to_4():
+        nonlocal jug_4, jug_3
+        space_in_jug_4 = 4 - jug_4
+        if jug_3 <= space_in_jug_4:
+            jug_4 += jug_3
+            jug_3 = 0
+        else:
+            jug_3 -= space_in_jug_4
+            jug_4 = 4
+
+    # Function to pour water from jug_4 to jug_3
+    def pour_jug_4_to_3():
+        nonlocal jug_4, jug_3
+        space_in_jug_3 = 3 - jug_3
+        if jug_4 <= space_in_jug_3:
+            jug_3 += jug_4
+            jug_4 = 0
+        else:
+            jug_4 -= space_in_jug_3
+            jug_3 = 3
+
+    # Main logic to solve the problem
+    fill_jug_4()
+    pour_jug_4_to_3()
+    empty_jug_3()
+    pour_jug_4_to_3()
+    fill_jug_4()
+    pour_jug_4_to_3()
+
+    # Print the solution
+    print("Steps to get 2 gallons of water in the 4-gallon jug:")
+    print("(Fill 4-gallon jug, Pour water from 4-gallon jug to 3-gallon jug, Empty 3-gallon jug)")
+    print("(Pour water from 4-gallon jug to 3-gallon jug, Fill 4-gallon jug, Pour water from 4-gallon jug to 3-gallon jug)")
+    print("(2 gallons of water is now in the 4-gallon jug)")
+
+# Call the function to solve the problem
+water_jug_problem()
+
+output:
+
+Steps to get 2 gallons of water in the 4-gallon jug:
+(Fill 4-gallon jug, Pour water from 4-gallon jug to 3-gallon jug, Empty 3-gallon jug)
+(Pour water from 4-gallon jug to 3-gallon jug, Fill 4-gallon jug, Pour water from 4-gallon jug to 3-gallon jug)
+(2 gallons of water is now in the 4-gallon jug)
