@@ -1,0 +1,40 @@
+class Graph:
+    def __init__(self, vertices):
+        self.vertices = vertices
+        self.adjacency_list = {vertex: [] for vertex in vertices}
+    
+    def add_edge(self, u, v):
+        self.adjacency_list[u].append(v)
+        self.adjacency_list[v].append(u)
+    
+    def greedy_coloring(self):
+        colors = {}  # Dictionary to store assigned colors
+        
+        # Assign the first color to the first vertex
+        colors[self.vertices[0]] = 0
+        
+        # Assign colors to remaining vertices
+        for vertex in self.vertices[1:]:
+            available_colors = set(range(len(self.vertices)))  # Set of available colors
+            
+            # Check colors of adjacent vertices and remove them from available colors
+            for neighbor in self.adjacency_list[vertex]:
+                if neighbor in colors:
+                    available_colors.discard(colors[neighbor])
+            
+            # Assign the minimum available color to the current vertex
+            colors[vertex] = min(available_colors)
+        
+        return colors
+
+# Example usage
+vertices = ['A', 'B', 'C', 'D', 'E']
+edges = [('A', 'B'), ('A', 'C'), ('B', 'C'), ('B', 'D'), ('C', 'D'), ('C', 'E'), ('D', 'E')]
+graph = Graph(vertices)
+for edge in edges:
+    graph.add_edge(*edge)
+
+colors = graph.greedy_coloring()
+print("Vertex\tColor")
+for vertex, color in colors.items():
+    print(f"{vertex}\t{color}")
