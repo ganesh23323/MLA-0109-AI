@@ -1,0 +1,78 @@
+import heapq
+import itertools
+
+class PuzzleState:
+    def __init__(self, board, parent=None, move=None):
+        self.board = board
+        self.parent = parent
+        self.move = move
+        if self.parent:
+            self.cost = self.parent.cost + 1
+        else:
+            self.cost = 0
+    
+    def __lt__(self, other):
+        return self.cost < other.cost
+    
+    def __eq__(self, other):
+        return self.board == other.board
+    
+    def __hash__(self):
+        return hash(str(self.board))
+    
+    def __repr__(self):
+        return f'PuzzleState({self.board})'
+    
+    def is_goal(self, goal_state):
+        return self.board == goal_state.board
+    
+    def get_possible_moves(self):
+        empty_tile = [(i, j) for i in range(3) for j in range(3) if self.board[i][j] == 0][0]
+        moves = []
+        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            new_x, new_y = empty_tile[0] + dx, empty_tile[1] + dy
+            if 0 <= new_x < 3 and 0 <= new_y < 3:
+                new_board = [row[:] for row in self.board]
+                new_board[empty_tile[0]][empty_tile[1]], new_board[new_x][new_y] = new_board[new_x][new_y], new_board[empty_tile[0]][empty_tile[1]]
+                moves.append(PuzzleState(new_board, parent=self, move=(dx, dy)))
+        return moves
+
+def manhattan_distance(state, goal_state):
+    distance = 0
+    for i in range(3):
+        for j in range(3):
+            value = state.board[i][j]
+            if value != 0:
+                goal_position = [(k, l) for k in range(3) for l in range(3) if goal_state.board[k][l] == value][0]
+                distance += abs(goal_position[0] - i) + abs(goal_position[1] - j)
+    return distance
+
+def astar(initial_state, goal_state):
+    open_list = []
+    heapq.heappush(open_list, initial_state)
+    closed_list = set()
+    
+    while open_list:
+        current_state = heapq.heappop(open_list)
+        if current_state.is_goal(goal_state):
+            path = []
+            while current_state:
+                path.append(current_state.move)
+                current_state = current_state.parent
+            return path[::-1]
+        closed_list.add(current_state)
+        
+        for move in current_state.get_possible_moves():
+            if move not in closed_list:
+                move_cost = move.cost + manhattan_distance(move, goal_state)
+                if move not in open_list:
+                    heapq.heappush(open_list, move)
+                elif move_cost < move.cost:
+                    open_list.remove(move)
+                    heapq.heappush(open_list, move)
+
+# Example usage
+initial_state = PuzzleState([[1, 2, 3], [4, 0, 5], [6, 7, 8]])
+goal_state = PuzzleState([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
+solution = astar(initial_state, goal_state)
+print(solution)
