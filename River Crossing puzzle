@@ -1,0 +1,87 @@
+from collections import deque
+
+class State:
+    def __init__(self, missionaries, cannibals, boat, parent=None):
+        self.missionaries = missionaries
+        self.cannibals = cannibals
+        self.boat = boat
+        self.parent = parent
+
+    def is_valid(self):
+        if self.missionaries < 0 or self.cannibals < 0 or self.missionaries > 3 or self.cannibals > 3:
+            return False
+        if self.missionaries > 0 and self.missionaries < self.cannibals:
+            return False
+        if 3 - self.missionaries > 0 and 3 - self.missionaries < 3 - self.cannibals:
+            return False
+        return True
+
+    def is_goal(self):
+        return self.missionaries == 0 and self.cannibals == 0 and self.boat == 0
+
+    def __eq__(self, other):
+        return self.missionaries == other.missionaries and self.cannibals == other.cannibals and self.boat == other.boat
+
+    def __hash__(self):
+        return hash((self.missionaries, self.cannibals, self.boat))
+
+    def __str__(self):
+        return f"({self.missionaries}, {self.cannibals}, {'left' if self.boat == 0 else 'right'})"
+
+def get_successors(state):
+    successors = []
+    if state.boat == 0:
+        successors.extend([
+            State(state.missionaries - 1, state.cannibals, 1, state),
+            State(state.missionaries - 2, state.cannibals, 1, state),
+            State(state.missionaries, state.cannibals - 1, 1, state),
+            State(state.missionaries, state.cannibals - 2, 1, state),
+            State(state.missionaries - 1, state.cannibals - 1, 1, state)
+        ])
+    else:
+        successors.extend([
+            State(state.missionaries + 1, state.cannibals, 0, state),
+            State(state.missionaries + 2, state.cannibals, 0, state),
+            State(state.missionaries, state.cannibals + 1, 0, state),
+            State(state.missionaries, state.cannibals + 2, 0, state),
+            State(state.missionaries + 1, state.cannibals + 1, 0, state)
+        ])
+    return [succ for succ in successors if succ.is_valid()]
+
+def bfs():
+    initial_state = State(3, 3, 0)
+    if initial_state.is_goal():
+        return [initial_state]
+
+    frontier = deque([initial_state])
+    visited = set()
+    visited.add(initial_state)
+
+    while frontier:
+        current_state = frontier.popleft()
+        for successor in get_successors(current_state):
+            if successor not in visited:
+                if successor.is_goal():
+                    solution = [successor]
+                    while successor.parent:
+                        solution.append(successor.parent)
+                        successor = successor.parent
+                    return solution[::-1]
+                frontier.append(successor)
+                visited.add(successor)
+    return None
+
+def print_solution(solution):
+    for idx, state in enumerate(solution):
+        print(f"Step {idx + 1}: {state}")
+
+def main():
+    solution = bfs()
+    if solution:
+        print("Solution found:")
+        print_solution(solution)
+    else:
+        print("No solution found.")
+
+if __name__ == "__main__":
+    main()
