@@ -1,0 +1,71 @@
+import random
+
+# Define the graph as an adjacency list
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'C', 'D'],
+    'C': ['A', 'B', 'D', 'E'],
+    'D': ['B', 'C', 'E', 'F'],
+    'E': ['C', 'D', 'F'],
+    'F': ['D', 'E']
+}
+
+# Function to check if the coloring is valid
+def is_valid_coloring(graph, coloring):
+    for node, neighbors in graph.items():
+        for neighbor in neighbors:
+            if coloring[node] == coloring[neighbor]:
+                return False
+    return True
+
+# Function to generate a random initial coloring
+def generate_initial_coloring(graph, num_colors):
+    return {node: random.randint(1, num_colors) for node in graph}
+
+# Function to evaluate the number of conflicts in the coloring
+def evaluate_coloring(graph, coloring):
+    conflicts = 0
+    for node, neighbors in graph.items():
+        for neighbor in neighbors:
+            if coloring[node] == coloring[neighbor]:
+                conflicts += 1
+    return conflicts // 2  # Divide by 2 because each conflict is counted twice
+
+# Function to find the best neighbor
+def find_best_neighbor(graph, current_coloring, num_colors):
+    best_coloring = current_coloring.copy()
+    best_conflicts = evaluate_coloring(graph, current_coloring)
+
+    for node in graph:
+        for color in range(1, num_colors + 1):
+            if current_coloring[node] != color:
+                new_coloring = current_coloring.copy()
+                new_coloring[node] = color
+                conflicts = evaluate_coloring(graph, new_coloring)
+                if conflicts < best_conflicts:
+                    best_coloring = new_coloring
+                    best_conflicts = conflicts
+
+    return best_coloring
+
+# Hill Climbing algorithm
+def hill_climbing(graph, num_colors, max_iterations=1000):
+    current_coloring = generate_initial_coloring(graph, num_colors)
+    current_conflicts = evaluate_coloring(graph, current_coloring)
+    
+    for _ in range(max_iterations):
+        next_coloring = find_best_neighbor(graph, current_coloring, num_colors)
+        next_conflicts = evaluate_coloring(graph, next_coloring)
+        
+        if next_conflicts >= current_conflicts:
+            break
+        
+        current_coloring = next_coloring
+        current_conflicts = next_conflicts
+    
+    return current_coloring
+
+# Example usage
+num_colors = 3
+coloring = hill_climbing(graph, num_colors)
+print("Final Coloring:", coloring)
